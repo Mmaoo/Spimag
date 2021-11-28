@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/deleteElement"
+        android:icon="@drawable/ic_baseline_delete_black_24"
+        android:title="Usuń"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/save"
+        android:icon="@drawable/ic_baseline_check_black_24"
+        android:title="Zapisz"
+        app:showAsAction="ifRoom"/>
+</menu>

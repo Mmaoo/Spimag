@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "881254819522",
+    "firebase_url": "https://spimag-98ab4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "spimag-98ab4",
+    "storage_bucket": "spimag-98ab4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881254819522:android:4efeaa383cf46bada9bd5b",
+        "android_client_info": {
+          "package_name": "com.mmaoo.spimag"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881254819522-6ujjfdqm1de1hk9f7eo83o49pf4g0pfh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-7PRPFykBj18z_MzUWZZMENdoFtMke50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881254819522-6ujjfdqm1de1hk9f7eo83o49pf4g0pfh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

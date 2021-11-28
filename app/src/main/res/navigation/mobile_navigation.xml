@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_item_list">
+
+    <action
+        android:id="@+id/action_navigate_to_item_view"
+        app:destination="@id/navigation_item_view" />
+
+    <action
+        android:id="@+id/action_navigate_to_area_add"
+        app:destination="@id/navigation_area_add" />
+
+    <action
+        android:id="@+id/action_navigate_to_area_show"
+        app:destination="@id/navigation_area_show" />
+
+    <action
+        android:id="@+id/action_navigate_to_area_list"
+        app:destination="@id/navigation_area_list" />
+
+    <fragment
+        android:id="@+id/navigation_item_list"
+        android:name="com.mmaoo.spimag.ui.itemList.ItemListFragment"
+        android:label="ItemList"
+        tools:layout="@layout/fragment_item_list" />
+
+    <fragment
+        android:id="@+id/navigation_area_show"
+        android:name="com.mmaoo.spimag.ui.areaShow.AreaShowFragment"
+        android:label="AreaShow"
+        tools:layout="@layout/fragment_area_show" />
+
+    <fragment
+        android:id="@+id/navigation_area_list"
+        android:name="com.mmaoo.spimag.ui.areaList.AreaListFragment"
+        android:label="AreaList"
+        tools:layout="@layout/fragment_area_list" />
+
+    <fragment
+        android:id="@+id/navigation_item_view"
+        android:name="com.mmaoo.spimag.ui.ItemView.ItemViewFragment"
+        android:label="ItemView"
+        tools:layout="@layout/fragment_item_view" />
+
+    <fragment
+        android:id="@+id/navigation_area_add"
+        android:name="com.mmaoo.spimag.ui.areaAdd.AreaAddFragment"
+        android:label="AreaAdd"
+        tools:layout="@layout/fragment_area_add" />
+
+</navigation>

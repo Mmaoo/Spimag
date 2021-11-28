@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.ItemView.ItemViewFragment">
+
+<!--    <ScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/itemNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nazwa"
+                android:inputType="text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/itemNameEditButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_edit_black_24" />
+
+            <EditText
+                android:id="@+id/itemShortNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Krótka nazwa / Kod"
+                android:inputType="text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/itemShortNameEditButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_edit_black_24" />
+
+            <EditText
+                android:id="@+id/packageTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Opakowanie (np. Słoik 250ml)"
+                android:inputType="text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/packageEditButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_edit_black_24" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ilość: " />
+
+<!--            <TextView-->
+<!--                android:id="@+id/packageTextView"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="paczka"/>-->
+
+            <TextView
+                android:id="@+id/amountTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"/>
+
+            <Button
+                android:id="@+id/decPackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_remove_black_24" />
+
+            <Button
+                android:id="@+id/incPackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_add_black_24" />
+
+            <TextView
+                android:id="@+id/itemAreaTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dodaj miejsce"/>
+
+            <Button
+                android:id="@+id/itemAreaEditButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_edit_black_24" />
+
+            <ImageView
+                android:id="@+id/itemAreaImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+        </LinearLayout>
+<!--    </ScrollView>-->
+
+</ScrollView>

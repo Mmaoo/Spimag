@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_item_list"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="Przedmioty" />
+
+<!--    <item-->
+<!--        android:id="@+id/navigation_area_show"-->
+<!--        android:icon="@drawable/ic_dashboard_black_24dp"-->
+<!--        android:title="@string/title_dashboard" />-->
+
+    <item
+        android:id="@+id/navigation_area_list"
+        android:icon="@drawable/ic_baseline_crop_black_5_4_24"
+        android:title="Obszary" />
+
+</menu>
