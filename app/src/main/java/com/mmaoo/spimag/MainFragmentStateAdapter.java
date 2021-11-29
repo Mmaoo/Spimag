@@ -43,8 +43,8 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        Log.d(this.getClass().toString(),"createFragment, position="+position+
-                ", itemFragmentsSize="+itemsFragments.size()+", areaFragmentSize="+areasFragments.size());
+//        Log.d(this.getClass().toString(),"createFragment, position="+position+
+//                ", itemFragmentsSize="+itemsFragments.size()+", areaFragmentSize="+areasFragments.size());
         if(position == AREAS_POSITION){
             if(areasFragments.isEmpty()) return BASE_FRAGMENTS.get(position);
             else return areasFragments.get(areasFragments.size()-1);
@@ -56,13 +56,13 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        Log.d(this.getClass().toString(),"getItemCount");
+//        Log.d(this.getClass().toString(),"getItemCount");
         return 2;
     }
 
     @Override
     public long getItemId(int position) {
-        Log.d(this.getClass().toString(),"getItemId, position="+position);
+//        Log.d(this.getClass().toString(),"getItemId, position="+position);
         if(position == ITEMS_POSITION &&
         createFragment(position).equals(BASE_FRAGMENTS.get(position)))
             return ITEMS_POSITION;
@@ -73,7 +73,7 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
     }
 
     public void updateFragment(Fragment fragment, int position){
-        Log.d(this.getClass().toString(),"updateFragment, fragment="+fragment.toString()+", position="+position);
+//        Log.d(this.getClass().toString(),"updateFragment, fragment="+fragment.toString()+", position="+position);
         if(!BASE_FRAGMENTS.contains(fragment)){
             addInnerFragment(fragment,position);
         }
@@ -81,7 +81,7 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
     }
 
     private void addInnerFragment(Fragment fragment, int position){
-        Log.d(this.getClass().toString(),"addInnerFragment, fragment="+fragment.toString()+", position="+position);
+//        Log.d(this.getClass().toString(),"addInnerFragment, fragment="+fragment.toString()+", position="+position);
         if(position == AREAS_POSITION) {
             areasFragments.add(fragment);
         }else{
@@ -90,7 +90,7 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
     }
 
     public boolean removeFragment(Fragment fragment, int position){
-        Log.d(this.getClass().toString(),"removeFragment, fragment="+fragment.toString()+", position="+position);
+//        Log.d(this.getClass().toString(),"removeFragment, fragment="+fragment.toString()+", position="+position);
         if(position == ITEMS_POSITION){
             if(itemsFragments.contains(fragment)){
                 removeInnerFragment(fragment,itemsFragments);
@@ -106,8 +106,9 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
     }
 
     private void removeInnerFragment(Fragment fragment, List<Fragment> tabFragments){
-        Log.d(this.getClass().toString(),"removeInnerFragment, fragment="+fragment.toString());
+//        Log.d(this.getClass().toString(),"removeInnerFragment, fragment="+fragment.toString());
         tabFragments.remove(fragment);
         notifyDataSetChanged();
     }
+
 }

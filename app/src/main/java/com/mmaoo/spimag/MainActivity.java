@@ -1,8 +1,11 @@
 package com.mmaoo.spimag;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -18,6 +21,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,43 +42,55 @@ public class MainActivity extends AppCompatActivity implements Navigable {
 
     int currentTabPosition = 0;
 
+    ActivityResultLauncher<Intent> signInLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(new LinearLayout(this));
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        if(FirebaseAuth.getInstance().getCurrentUser() != null) onSignInResult(RESULT_OK);
+        else {
+            setContentView(new LinearLayout(this));
 
-        final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
-                new FirebaseAuthUIActivityResultContract(),
-                new ActivityResultCallback<FirebaseAuthUIAuthenticationResult>() {
-                    @Override
-                    public void onActivityResult(FirebaseAuthUIAuthenticationResult result) {
-                        onSignInResult(result);
+            signInLauncher = registerForActivityResult(
+                    new FirebaseAuthUIActivityResultContract(),
+                    new ActivityResultCallback<FirebaseAuthUIAuthenticationResult>() {
+                        @Override
+                        public void onActivityResult(FirebaseAuthUIAuthenticationResult result) {
+                            IdpResponse response = result.getIdpResponse();
+                            onSignInResult(result.getResultCode());
+                        }
                     }
-                }
-        );
+            );
+
+            // Passing each menu ID as a set of Ids because each
+            // menu should be considered as top level destinations.
+
+            launchSignInActivity();
+        }
+    }
+
+    public void launchSignInActivity(){
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build()
-//                ,new AuthUI.IdpConfig.GoogleBuilder().build()
+                ,new AuthUI.IdpConfig.GoogleBuilder().build()
         );
 
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
+                .setIsSmartLockEnabled(false)
                 .build();
 
         signInLauncher.launch(signInIntent);
-
     }
 
-    private void onSignInResult(FirebaseAuthUIAuthenticationResult result){
+    private void onSignInResult(Integer result){
         setContentView(R.layout.activity_main);
         navView = findViewById(R.id.nav_view);
-        IdpResponse response = result.getIdpResponse();
-        if(result.getResultCode() == RESULT_OK){
+
+        if(result == RESULT_OK){
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             Toast toast = Toast.makeText(this,"Zalogowano",Toast.LENGTH_SHORT);
             toast.show();
@@ -127,6 +143,28 @@ public class MainActivity extends AppCompatActivity implements Navigable {
             toast.show();
             finish();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.change_password: break;
+            case R.id.logout:
+                FirebaseAuth.getInstance().signOut();
+                Intent restartActivity = new Intent(this,MainActivity.class);
+                restartActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(restartActivity);
+                finish();
+                return true;
+        }
+        return false;
     }
 
     @Override
