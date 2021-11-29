@@ -195,6 +195,55 @@ public class FBDatabase implements Database {
     }
 
     @Override
+    public Task<Area> getArea(String id) {
+        String uid = AppUser.getInstance().getUid();
+        Query query = firebaseDatabase.getReference().child(PATH_USER).child(uid).child(PATH_AREA).child(id);
+        Command<DataSnapshot,Area> command = new Command<DataSnapshot, Area>() {
+            @Override
+            public Area run(DataSnapshot areaDS) {
+                Area area = new Area(areaDS.getKey());
+                String name = areaDS.child("name").getValue(String.class);
+                Integer height = areaDS.child("height").getValue(Integer.class);
+                Integer width = areaDS.child("weight").getValue(Integer.class);
+                if(name != null) area.setName(name);
+                if(height != null) area.setHeight(height);
+                if(width != null) area.setWidth(width);
+
+                for(DataSnapshot subAreaDS : areaDS.child("areas").getChildren()){
+                    Area subArea = new Area(subAreaDS.getKey());
+                    AreaElement areaElement = castAreaElement(subAreaDS.child("areaElement"));
+                    areaElement.areaId = area.getId();
+                    Pair<Area,AreaElement> pair = new Pair<>(subArea,areaElement);
+                    area.getAreas().add(pair);
+                }
+
+                for(DataSnapshot itemDS : areaDS.child("items").getChildren()){
+                    Item item = new Item();
+                    item.setId(itemDS.getKey());
+                    String itemName = itemDS.child("name").getValue(String.class);
+                    String itemShortName = itemDS.child("shortName").getValue(String.class);
+                    String itemPack = itemDS.child("pack").getValue(String.class);
+                    Float itemAmount = itemDS.child("amount").getValue(Float.class);
+                    Long itemTimestamp = itemDS.child("timestamp").getValue(Long.class);
+                    if(itemName != null) item.setName(itemName);
+                    if(itemShortName != null) item.setShortName(itemShortName);
+                    if(itemPack != null) item.setPack(itemPack);
+                    if(itemAmount != null) item.setAmount(itemAmount);
+                    if(itemTimestamp != null) item.setTimestamp(itemTimestamp);
+
+                    AreaElement areaElement = castAreaElement(itemDS.child("areaElement"));
+                    areaElement.areaId = area.getId();
+                    if(area != null) item.setAreaElement(areaElement);
+                    area.getItems().add(new Pair<Item,AreaElement>(item,item.getAreaElement()));
+                }
+                return area;
+            }
+        };
+        Task<Area> task = new GetDataTask<>(query,command);
+        return task;
+    }
+
+    @Override
     public Task<ArrayList<Area>> getAllAreas(){
         String uid = AppUser.getInstance().getUid();
         Query query = firebaseDatabase.getReference().child(PATH_USER).child(uid).child(PATH_AREA).orderByChild("timestamp");

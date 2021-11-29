@@ -13,6 +13,7 @@ public interface Database {
     Task<Area> add(Area area);
     Task<Area> update(Area area);
     Task<Area> remove(Area area);
+    Task<Area> getArea(String id);
     Task<ArrayList<Area>> getAllAreas();
 
 //    Task<Item> add(Package pack);
