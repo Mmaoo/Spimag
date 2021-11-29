@@ -19,10 +19,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.mmaoo.spimag.Backable;
 import com.mmaoo.spimag.Navigable;
 import com.mmaoo.spimag.R;
 import com.mmaoo.spimag.model.AppDatabase;
+import com.mmaoo.spimag.model.Area;
+import com.mmaoo.spimag.model.FBDatabase;
 import com.mmaoo.spimag.model.Item;
 import com.mmaoo.spimag.ui.areaShow.AreaShowFragment;
 
@@ -150,6 +154,7 @@ public class ItemViewFragment extends Fragment implements Backable {
         itemAreaImageView = root.findViewById(R.id.itemAreaImageView);
 
         action = arguments.getInt("action",Integer.MAX_VALUE);
+
         switch(action){
             case ACTION_SHOW:
                 try {
@@ -224,6 +229,12 @@ public class ItemViewFragment extends Fragment implements Backable {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(action != 0) actionMode = root.startActionMode(actionModeCallback);
+    }
+
     private void initShow(Item item){
 //        itemNameTextView.setFocusable(false);
         itemNameTextView.setEnabled(false);
@@ -237,11 +248,22 @@ public class ItemViewFragment extends Fragment implements Backable {
         packageTextView.setEnabled(false);
         packageTextView.setText(item.getPack());
         amountTextView.setText(Float.toString(item.getAmount()));
+        if(item.getAreaElement() != null){
+            AppDatabase.getInstance().getArea(item.getAreaElement().areaId).addOnCompleteListener(new OnCompleteListener<Area>() {
+                @Override
+                public void onComplete(@NonNull Task<Area> task) {
+                    if(task.isSuccessful()){
+                        itemAreaTextView.setText(task.getResult().getName());
+                    }
+                }
+            });
+
+        }
     }
 
     private void editName(){
         Log.w(this.getClass().toString(),"editName");
-        action = ACTION_EDIT_NAME;
+        if(action != ACTION_ADD) action = ACTION_EDIT_NAME;
 //        itemNameTextView.setFocusable(true);
         itemNameTextView.setEnabled(true);
         itemNameTextView.requestFocus();

@@ -97,9 +97,11 @@ public class AreaAddFragment extends Fragment implements Backable {
         action = arguments.getInt("action",Integer.MAX_VALUE);
         switch(action){
             case ACTION_EDIT:
+                Log.w(this.getClass().toString(),"AREA ACTION EDIT");
                 try {
                     area = (Area) arguments.getSerializable("area");
                     areaNameTextView.setText(area.getName());
+//                    actionMode = root.startActionMode(actionModeCallback);
                 }catch (ClassCastException e) {
                     Log.w(this.getClass().toString(),e.getMessage());
                     Log.w(this.getClass().toString(), Arrays.toString(e.getStackTrace()));
@@ -107,11 +109,18 @@ public class AreaAddFragment extends Fragment implements Backable {
                 }
                 break;
             case ACTION_ADD:
+                Log.w(this.getClass().toString(),"AREA ACTION ADD");
                 area = new Area();
-                actionMode = root.startActionMode(actionModeCallback);
+                //actionMode = root.startActionMode(actionModeCallback);
                 break;
             default: navigable.navigateUp();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        actionMode = root.startActionMode(actionModeCallback);
     }
 
     @Override
