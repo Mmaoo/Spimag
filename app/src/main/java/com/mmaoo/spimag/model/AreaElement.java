@@ -27,13 +27,17 @@ public class AreaElement implements AreaDrawable, Serializable {
     }
 
     @Override
-    public void draw(Canvas canvas, PointF areaBitmapPos, float scale, String name) {
+    public void draw(Canvas canvas, PointF areaBitmapPos, float scale, String name, AreaDrawable.Settings settings) {
         Paint paint = new Paint();
         paint.setColor(color);
         float x1 = areaBitmapPos.x + this.x;
         float y1 = areaBitmapPos.y + this.y;
         paint.setStrokeWidth(100*scale);
 //        Log.d("test","Bx="+areaBitmapPos.x+", By="+areaBitmapPos.y+"; x="+x1+", y="+y1);
+        if(settings != null && (settings instanceof Settings)){
+            Settings set = (Settings) settings;
+            if(set.color != null) paint.setColor(set.color);
+        }
         canvas.drawPoint(x1,y1,paint);
     }
 
@@ -61,5 +65,29 @@ public class AreaElement implements AreaDrawable, Serializable {
                 ", y=" + y +
                 ", color=" + color +
                 '}';
+    }
+
+    public static class Settings extends AreaDrawable.Settings {
+        Integer color;
+
+        public Settings(int color) {
+            this.color = color;
+        }
+
+        public static class Builder {
+            Integer color;
+
+            public Builder() {
+            }
+
+            public Builder setColor(int color){
+                this.color = color;
+                return this;
+            }
+
+            public Settings build(){
+                return new Settings(color);
+            }
+        }
     }
 }

@@ -169,25 +169,21 @@ public class MainActivity extends AppCompatActivity implements Navigable {
 
     @Override
     public void onBackPressed() {
-//        Log.w(this.getClass().toString(),"onBackPressed");
-
         boolean handled = false;
-        Fragment navHostFragment = getSupportFragmentManager().getPrimaryNavigationFragment();
-        if(navHostFragment != null) {
-            List<Fragment> fragmentList = navHostFragment.getChildFragmentManager().getFragments();
-            for (Fragment f : fragmentList) {
-                if (f instanceof Backable) {
-                    handled = ((Backable) f).onBackPressed();
-                    if (handled) break;
-                }
-            }
-        }
+        Fragment currentFragment = mainFragmentStateAdapter.createFragment(currentTabPosition);
+        if(currentFragment instanceof Backable) handled = ((Backable) currentFragment).onBackPressed();
+//        Fragment navHostFragment = getSupportFragmentManager().getPrimaryNavigationFragment();
+//        if(navHostFragment != null) {
+//            List<Fragment> fragmentList = navHostFragment.getChildFragmentManager().getFragments();
+//            for (Fragment f : fragmentList) {
+//                if (f instanceof Backable) {
+//                    handled = ((Backable) f).onBackPressed();
+//                    if (handled) break;
+//                }
+//            }
+//        }
         if(!handled) {
-            viewPager.setUserInputEnabled(true);
-            if(!mainFragmentStateAdapter.removeFragment(mainFragmentStateAdapter.createFragment(currentTabPosition),currentTabPosition)){
-                super.onBackPressed();
-            }
-
+            navigateUp();
         }
     }
 
@@ -248,11 +244,18 @@ public class MainActivity extends AppCompatActivity implements Navigable {
 
     @Override
     public void navigateUp() {
-        onBackPressed();
-//        if(!mainFragmentStateAdapter.removeFragment(mainFragmentStateAdapter.createFragment(currentTabPosition),currentTabPosition)){
-//            finish();
-//        }
-//        Navigation.findNavController(this, R.id.nav_host_fragment).navigateUp();
+        viewPager.setUserInputEnabled(true);
+        if(!mainFragmentStateAdapter.removeFragment(mainFragmentStateAdapter.createFragment(currentTabPosition),currentTabPosition)){
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void navigateUp(Bundle bundle) {
+        viewPager.setUserInputEnabled(true);
+        if(!mainFragmentStateAdapter.removeFragment(mainFragmentStateAdapter.createFragment(currentTabPosition),currentTabPosition,bundle)){
+            super.onBackPressed();
+        }
     }
 
     private void setProperBottomNavigationItem(int action){

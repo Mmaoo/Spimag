@@ -33,6 +33,8 @@ public class AreaShowFragment extends Fragment implements Backable {
 
     public static final int ACTION_SHOW = 0;
     public static final int ACTION_ADD_ITEM = 1;
+    public static final int ACTION_ADD_ITEM_SHOW = 10;
+    public static final int ACTION_SHOW_ITEM = 2;
 
     private AreaShowViewModel areaShowViewModel;
     private AreaSurfaceView areaSurfaceView;
@@ -99,6 +101,15 @@ public class AreaShowFragment extends Fragment implements Backable {
             }
         });
 
+//        areaSurfaceView.resumePaint();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.w("test","actionOnStart="+action);
+        Bundle arguments = getArguments();
+        areaSurfaceView.setNavigable(navigable);
         switch(action){
             case ACTION_ADD_ITEM:
                 try {
@@ -121,12 +132,26 @@ public class AreaShowFragment extends Fragment implements Backable {
                 }
                 break;
             case ACTION_SHOW:
-                areaSurfaceView.setAction(action);
+                break;
+            case ACTION_SHOW_ITEM:
+                try {
+                    Item sitem = (Item) arguments.getSerializable("item");
+                    areaSurfaceView.setAction(action);
+                    for (Pair<Item, AreaElement> itemPair : area.getItems()) {
+                        if (itemPair.first.getId() == sitem.getId()) {
+                            Pair<Item, AreaElement> viewedItem = itemPair;
+                            areaSurfaceView.setViewedAreaElement(viewedItem);
+                            break;
+                        }
+                    }
+                    areaSurfaceView.setAction(action);
+                }catch (ClassCastException e) {
+                    e.printStackTrace();
+                    navigable.navigateUp();
+                }
                 break;
             default: navigable.navigateUp();
         }
-
-//        areaSurfaceView.resumePaint();
     }
 
     @Override
@@ -154,7 +179,6 @@ public class AreaShowFragment extends Fragment implements Backable {
         return true;
     }
 
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -169,6 +193,6 @@ public class AreaShowFragment extends Fragment implements Backable {
     @Override
     public boolean onBackPressed() {
         if(areaSurfaceView instanceof Backable) return  ((Backable) areaSurfaceView).onBackPressed();
-        return true;
+        return false;
     }
 }

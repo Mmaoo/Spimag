@@ -35,7 +35,7 @@ public class RectAreaElement extends AreaElement implements Serializable {
     }
 
     @Override
-    public void draw(Canvas canvas, PointF areaBitmapPos, float scale, String name) {
+    public void draw(Canvas canvas, PointF areaBitmapPos, float scale, String name, AreaDrawable.Settings settings) {
         Paint paint = new Paint();
         paint.setColor(color);
         //int size = getWidth() < getHeight() ? getWidth()/4 : getHeight()/4;
@@ -49,6 +49,11 @@ public class RectAreaElement extends AreaElement implements Serializable {
         x2 *= scale;
         y2 *= scale;
 //        Log.d("test","Bx="+areaBitmapPos.x+", By="+areaBitmapPos.y+"; x1="+x1+", y1="+y1+", x2="+x2+", y2="+y2);
+        if(settings != null && (settings instanceof Settings)){
+            Settings set = (Settings) settings;
+            if(set.color != null) paint.setColor(set.color);
+        }
+
         canvas.drawRect(x1, y1, x2, y2, paint);
 
         Paint textPaint = new Paint();

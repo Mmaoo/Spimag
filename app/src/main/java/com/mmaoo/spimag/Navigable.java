@@ -6,4 +6,5 @@ public interface Navigable {
     void navigate(int action);
     void navigate(int action, Bundle bundle);
     void navigateUp();
+    void navigateUp(Bundle bundle);
 }

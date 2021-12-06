@@ -1,5 +1,6 @@
 package com.mmaoo.spimag;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -74,6 +75,34 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
 
     public void updateFragment(Fragment fragment, int position){
 //        Log.d(this.getClass().toString(),"updateFragment, fragment="+fragment.toString()+", position="+position);
+
+        if(BASE_FRAGMENTS.get(position).getClass().equals(fragment.getClass())){
+
+        }
+        if(position == ITEMS_POSITION){
+            int existed = -1;
+            for(int i=itemsFragments.size()-1;i>=0;i--){
+                if(itemsFragments.get(i).getClass().equals(fragment.getClass())){
+                    existed = i;
+                    break;
+                }
+            }
+            if(existed >= 0){
+                for(int i=itemsFragments.size()-1;i>=existed;i--) itemsFragments.remove(i);
+            }
+        }else if(position == AREAS_POSITION){
+            int existed = -1;
+            for(int i=areasFragments.size()-1;i>=0;i--){
+                if(areasFragments.get(i).getClass().equals(fragment.getClass())){
+                    existed = i;
+                    break;
+                }
+            }
+            if(existed >= 0){
+                for(int i=areasFragments.size()-1;i>=existed;i--) areasFragments.remove(i);
+            }
+        }
+
         if(!BASE_FRAGMENTS.contains(fragment)){
             addInnerFragment(fragment,position);
         }
@@ -99,6 +128,24 @@ public class MainFragmentStateAdapter extends FragmentStateAdapter {
         }else if (position == AREAS_POSITION){
             if(areasFragments.contains(fragment)){
                 removeInnerFragment(fragment,areasFragments);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeFragment(Fragment fragment, int position, Bundle bundle){
+//        Log.d(this.getClass().toString(),"removeFragment, fragment="+fragment.toString()+", position="+position);
+        if(position == ITEMS_POSITION){
+            if(itemsFragments.contains(fragment)){
+                removeInnerFragment(fragment,itemsFragments);
+                itemsFragments.get(itemsFragments.size()-1).setArguments(bundle);
+                return true;
+            }
+        }else if (position == AREAS_POSITION){
+            if(areasFragments.contains(fragment)){
+                removeInnerFragment(fragment,areasFragments);
+                areasFragments.get(itemsFragments.size()-1).setArguments(bundle);
                 return true;
             }
         }

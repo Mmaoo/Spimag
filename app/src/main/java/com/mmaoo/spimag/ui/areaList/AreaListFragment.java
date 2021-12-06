@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -32,11 +35,13 @@ import java.util.Arrays;
 public class AreaListFragment extends Fragment {
 
     public static final int ACTION_ADD_ITEM = 1;
+    public static final int ACTION_NAVIGATE_UP = 999;
 
     Navigable navigable;
 
     private AreaListModel areaListModel;
 
+    TextView titleTextView;
     TextView searchTextView;
     FloatingActionButton addFloatingActionButton;
     RecyclerView areaListRecyclerView;
@@ -49,6 +54,8 @@ public class AreaListFragment extends Fragment {
     int action = -1;
 
     ArrayList<Area> areas;
+
+    ActionMode actionMode = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -70,10 +77,21 @@ public class AreaListFragment extends Fragment {
             action = arguments.getInt("action", Integer.MAX_VALUE);
         }
 
+        titleTextView = root.findViewById(R.id.titleTextView);
         searchTextView = root.findViewById(R.id.searchAreaEditText);
         addFloatingActionButton = root.findViewById(R.id.addAreaFloatingActionButton);
         areaListRecyclerView = root.findViewById(R.id.areaListRecyclerView);
         areaListSwipeRefreshLayout = root.findViewById(R.id.areaListSwipeRefreshLayout);
+
+        if(action == ACTION_ADD_ITEM) {
+            try {
+                Item item = (Item) arguments.getSerializable("item");
+                titleTextView.setText("Edycja: "+item.getName());
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+                navigable.navigateUp();
+            }
+        }
 
         addFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,6 +139,35 @@ public class AreaListFragment extends Fragment {
                 }
             }
         });
+
+//        areaRecyclerViewAdapter.getLongClickedItem().observe(getViewLifecycleOwner(), new Observer<Area>() {
+//            @Override
+//            public void onChanged(Area area) {
+//
+//                root.startActionMode(new ActionMode.Callback() {
+//                    @Override
+//                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public void onDestroyActionMode(ActionMode mode) {
+//
+//                    }
+//                })
+//            }
+//        });
+
         areaListRecyclerView.setAdapter(areaRecyclerViewAdapter);
 
         areaListSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

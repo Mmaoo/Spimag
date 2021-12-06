@@ -59,6 +59,7 @@ public class ItemViewFragment extends Fragment implements Backable {
     private int action = -1;
 
     private Item item = null;
+    private Area area = null;
 
     public ActionMode actionMode = null;
 
@@ -227,6 +228,8 @@ public class ItemViewFragment extends Fragment implements Backable {
                 navigable.navigate(R.id.action_navigate_to_area_list, args);
             }
         });
+
+
     }
 
     @Override
@@ -253,7 +256,20 @@ public class ItemViewFragment extends Fragment implements Backable {
                 @Override
                 public void onComplete(@NonNull Task<Area> task) {
                     if(task.isSuccessful()){
-                        itemAreaTextView.setText(task.getResult().getName());
+                        area = task.getResult();
+                        itemAreaTextView.setText(area.getName());
+                        View.OnClickListener actionShowItemOnClickListener = new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Bundle args = new Bundle();
+                                args.putSerializable("item",item);
+                                args.putSerializable("area",area);
+                                args.putInt("action",AreaShowFragment.ACTION_SHOW_ITEM);
+                                navigable.navigate(R.id.action_navigate_to_area_show,args);
+                            }
+                        };
+                        itemAreaTextView.setOnClickListener(actionShowItemOnClickListener);
+                        itemAreaImageView.setOnClickListener(actionShowItemOnClickListener);
                     }
                 }
             });
