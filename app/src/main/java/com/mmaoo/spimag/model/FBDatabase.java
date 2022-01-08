@@ -351,14 +351,14 @@ public class FBDatabase implements Database {
     }
 
 
-    /**
-     * Universal runnable method to execute
-     * @param <T> - class of method's parameter
-     * @param <R> - class of method's result
-     */
-    private interface Command<T,R>{
-        public R run(T param);
-    }
+//    /**
+//     * Universal runnable method to execute
+//     * @param <T> - class of method's parameter
+//     * @param <R> - class of method's result
+//     */
+//    private interface Command<T,R>{
+//        public R run(T param);
+//    }
 
     /**
      * Universal task to get data from firebase database

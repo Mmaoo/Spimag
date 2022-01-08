@@ -37,8 +37,6 @@ public class ItemListFragment extends Fragment {
 
     Navigable navigable;
 
-    private ItemListViewModel itemListViewModel;
-
     TextView searchTextView;
     FloatingActionButton addFloatingActionButton;
     RecyclerView itemListRecyclerView;
@@ -50,8 +48,7 @@ public class ItemListFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        itemListViewModel =
-                new ViewModelProvider(this).get(ItemListViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_item_list, container, false);
 
         searchTextView = root.findViewById(R.id.searchEditText);

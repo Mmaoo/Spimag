@@ -14,12 +14,14 @@ ItemViewHolder extends RecyclerView.ViewHolder {
 
     View itemView;
     TextView name;
+    TextView amount;
 
     public ItemViewHolder(@NonNull View itemView) {
         super(itemView);
 
         this.itemView = itemView;
         this.name = itemView.findViewById(R.id.nameTextView);
+        this.amount = itemView.findViewById(R.id.amountTextView);
     }
 
     /**
@@ -28,6 +30,7 @@ ItemViewHolder extends RecyclerView.ViewHolder {
      */
     public void bind(final Item model){
         if(model.getName() != null){this.name.setText(model.getName());}
+        this.amount.setText(Float.toString(model.getAmount()));
     }
 
     public View getItemView() {

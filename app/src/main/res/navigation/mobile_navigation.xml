@@ -21,6 +21,10 @@
         android:id="@+id/action_navigate_to_area_list"
         app:destination="@id/navigation_area_list" />
 
+    <action
+        android:id="@+id/action_navigate_to_area_background_edit"
+        app:destination="@id/navigation_area_background_edit"/>
+
     <fragment
         android:id="@+id/navigation_item_list"
         android:name="com.mmaoo.spimag.ui.itemList.ItemListFragment"
@@ -50,5 +54,11 @@
         android:name="com.mmaoo.spimag.ui.areaAdd.AreaAddFragment"
         android:label="AreaAdd"
         tools:layout="@layout/fragment_area_add" />
+
+    <fragment
+        android:id="@+id/navigation_area_background_edit"
+        android:name="com.mmaoo.spimag.ui.areaBackgroundEdit.AreaBackgroundEditFragment"
+        android:label="AreaBackgroundEdit"
+        tools:layout="@layout/fragment_area_background_edit" />
 
 </navigation>

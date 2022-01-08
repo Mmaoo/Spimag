@@ -31,15 +31,15 @@ import com.mmaoo.spimag.ui.areaShow.AreaShowFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class AreaListFragment extends Fragment {
 
     public static final int ACTION_ADD_ITEM = 1;
+    public static final int ACTION_ADD_AREA = 2;
     public static final int ACTION_NAVIGATE_UP = 999;
 
     Navigable navigable;
-
-    private AreaListModel areaListModel;
 
     TextView titleTextView;
     TextView searchTextView;
@@ -59,8 +59,6 @@ public class AreaListFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        areaListModel =
-                new ViewModelProvider(this).get(AreaListModel.class);
         root = inflater.inflate(R.layout.fragment_area_list, container, false);
 
         return root;
@@ -121,9 +119,8 @@ public class AreaListFragment extends Fragment {
             public void onChanged(Area area) {
                 if(area != null) {
                     Bundle args = new Bundle();
-                    args.putSerializable("area", area);
-
                     if(action == ACTION_ADD_ITEM) {
+                        args.putSerializable("area", area);
                         try {
                             Item item = (Item) arguments.getSerializable("item");
                             args.putSerializable("item",item);
@@ -132,7 +129,19 @@ public class AreaListFragment extends Fragment {
                             navigable.navigateUp();
                         }
                         args.putInt("action", AreaShowFragment.ACTION_ADD_ITEM);
-                    }else{
+                    }else if(action == ACTION_ADD_AREA){
+                        args.putSerializable("addArea", area);
+                        try {
+                            Area ar = (Area) arguments.getSerializable("area");
+                            args.putSerializable("area",ar);
+                            args.putInt("action",AreaShowFragment.ACTION_ADD_AREA);
+                        } catch (ClassCastException e) {
+                            e.printStackTrace();
+                            navigable.navigateUp();
+                        }
+                    }
+                    else{
+                        args.putSerializable("area", area);
                         args.putInt("action", AreaShowFragment.ACTION_SHOW);
                     }
                     navigable.navigate(R.id.action_navigate_to_area_show, args);

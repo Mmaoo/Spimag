@@ -25,6 +25,9 @@ import com.mmaoo.spimag.model.Area;
 import com.mmaoo.spimag.model.AreaElement;
 import com.mmaoo.spimag.model.Item;
 import com.mmaoo.spimag.model.RectAreaElement;
+import com.mmaoo.spimag.ui.ItemView.ItemViewFragment;
+import com.mmaoo.spimag.ui.areaAdd.AreaAddFragment;
+import com.mmaoo.spimag.ui.areaList.AreaListFragment;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -33,10 +36,10 @@ public class AreaShowFragment extends Fragment implements Backable {
 
     public static final int ACTION_SHOW = 0;
     public static final int ACTION_ADD_ITEM = 1;
-    public static final int ACTION_ADD_ITEM_SHOW = 10;
     public static final int ACTION_SHOW_ITEM = 2;
+    public static final int ACTION_ADD_AREA = 3;
+    public static final int ACTION_ADD_ITEM_SHOW = 10;
 
-    private AreaShowViewModel areaShowViewModel;
     private AreaSurfaceView areaSurfaceView;
 
     private View root;
@@ -48,8 +51,6 @@ public class AreaShowFragment extends Fragment implements Backable {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        areaShowViewModel =
-                new ViewModelProvider(this).get(AreaShowViewModel.class);
         root = inflater.inflate(R.layout.fragment_area_show, container, false);
         setHasOptionsMenu(true);
 
@@ -90,13 +91,19 @@ public class AreaShowFragment extends Fragment implements Backable {
         areaSurfaceView = root.findViewById(R.id.area_surface_view);
         areaSurfaceView.setArea(area);
 
-        areaSurfaceView.edited.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+        areaSurfaceView.clickedObject.observe(getViewLifecycleOwner(), new Observer<Object>() {
             @Override
-            public void onChanged(Boolean value) {
-                if(value){
-
-                }else{
-
+            public void onChanged(Object o) {
+                if(o instanceof Item){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("action", ItemViewFragment.ACTION_SHOW);
+                    bundle.putSerializable("item",(Item) o);
+                    navigable.navigate(R.id.action_navigate_to_item_view,bundle);
+                }else if(o instanceof Area){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("action", AreaShowFragment.ACTION_SHOW);
+                    bundle.putSerializable("area",(Area) o);
+                    navigable.navigate(R.id.action_navigate_to_area_show,bundle);
                 }
             }
         });
@@ -124,8 +131,27 @@ public class AreaShowFragment extends Fragment implements Backable {
                     rectAreaElement.y = (float) ((areaSurfaceView.getAreaHeight()/2.0) - (size/2.0));
                     Random rnd = new Random();
                     rectAreaElement.color = Color.argb(255,rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
-                    item.setAreaElement(rectAreaElement);
-                    areaSurfaceView.setEditedAreaElement(new Pair<Item, AreaElement>(item,rectAreaElement));
+                    //item.setAreaElement(rectAreaElement);
+                    areaSurfaceView.setEditedAreaElementOfItem(new Pair<Item, AreaElement>(item,rectAreaElement));
+                }catch (ClassCastException e) {
+                    e.printStackTrace();
+                    navigable.navigateUp();
+                }
+                break;
+            case ACTION_ADD_AREA:
+                try {
+                    areaSurfaceView.setAction(action);
+                    Area addArea = (Area) arguments.get("addArea");
+                    RectAreaElement rectAreaElement = new RectAreaElement();
+                    rectAreaElement.areaId = area.getId();
+                    int size = areaSurfaceView.getAreaWidth() < areaSurfaceView.getAreaHeight() ? areaSurfaceView.getAreaWidth()/8 : areaSurfaceView.getAreaHeight()/8;
+                    rectAreaElement.width = size;
+                    rectAreaElement.height = size;
+                    rectAreaElement.x = (float) ((areaSurfaceView.getAreaWidth()/2.0) - (size/2.0));
+                    rectAreaElement.y = (float) ((areaSurfaceView.getAreaHeight()/2.0) - (size/2.0));
+                    Random rnd = new Random();
+                    rectAreaElement.color = Color.argb(255,rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
+                    areaSurfaceView.setEditedAreaElementOfArea(new Pair<Area, AreaElement>(addArea,rectAreaElement));
                 }catch (ClassCastException e) {
                     e.printStackTrace();
                     navigable.navigateUp();
@@ -165,7 +191,7 @@ public class AreaShowFragment extends Fragment implements Backable {
         super.onOptionsItemSelected(item);
 
         switch (item.getItemId()){
-            case R.id.addElement:
+//            case R.id.addElement:
 //                RectAreaElement rectAreaElement = new RectAreaElement();
 //                int size = areaSurfaceView.getWidth() < areaSurfaceView.getHeight() ? areaSurfaceView.getWidth()/8 : areaSurfaceView.getHeight()/8;
 //                rectAreaElement.width = size;
@@ -173,6 +199,24 @@ public class AreaShowFragment extends Fragment implements Backable {
 //                Random rnd = new Random();
 //                rectAreaElement.color = Color.argb(255,rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
 //                areaSurfaceView.areaElements.add(rectAreaElement);
+//                break;
+            case R.id.changeName:
+                Bundle cNBundle = new Bundle();
+                cNBundle.putSerializable("area",area);
+                cNBundle.putInt("action", AreaAddFragment.ACTION_EDIT);
+                navigable.navigate(R.id.action_navigate_to_area_add,cNBundle);
+                break;
+            case R.id.changeBackgroundImage:
+                Bundle cBIBundle = new Bundle();
+                cBIBundle.putString("areaId",area.getId());
+//                cBIBundle.putSerializable("area",area);
+                navigable.navigate(R.id.action_navigate_to_area_background_edit,cBIBundle);
+                break;
+            case R.id.addArea:
+                Bundle aABundle = new Bundle();
+                aABundle.putInt("action", AreaListFragment.ACTION_ADD_AREA);
+                aABundle.putSerializable("area",area);
+                navigable.navigate(R.id.action_navigate_to_area_list,aABundle);
                 break;
         }
 

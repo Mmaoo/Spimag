@@ -52,8 +52,8 @@ public class ItemViewFragment extends Fragment implements Backable {
     private Button decPackButton;
     private Button incPackButton;
     private TextView itemAreaTextView;
+    private ImageView itemAreaTextViewIcon;
     private Button itemAreaEditButton;
-    private ImageView itemAreaImageView;
 
     private Navigable navigable;
     private int action = -1;
@@ -80,6 +80,8 @@ public class ItemViewFragment extends Fragment implements Backable {
             incPackButton.setEnabled(false);
             decPackButton.setEnabled(false);
             itemAreaEditButton.setEnabled(false);
+            itemAreaTextView.setClickable(false);
+            itemAreaTextViewIcon.setClickable(false);
             return true;
         }
 
@@ -113,6 +115,8 @@ public class ItemViewFragment extends Fragment implements Backable {
             incPackButton.setEnabled(true);
             decPackButton.setEnabled(true);
             itemAreaEditButton.setEnabled(true);
+            itemAreaTextView.setClickable(true);
+            itemAreaTextViewIcon.setClickable(true);
             actionMode = null;
             if (action == ACTION_ADD) navigable.navigateUp();
         }
@@ -151,8 +155,8 @@ public class ItemViewFragment extends Fragment implements Backable {
         decPackButton = root.findViewById(R.id.decPackButton);
         incPackButton = root.findViewById(R.id.incPackButton);
         itemAreaTextView = root.findViewById(R.id.itemAreaTextView);
+        itemAreaTextViewIcon = root.findViewById(R.id.itemAreaTextViewIcon);
         itemAreaEditButton = root.findViewById(R.id.itemAreaEditButton);
-        itemAreaImageView = root.findViewById(R.id.itemAreaImageView);
 
         action = arguments.getInt("action",Integer.MAX_VALUE);
 
@@ -239,13 +243,8 @@ public class ItemViewFragment extends Fragment implements Backable {
     }
 
     private void initShow(Item item){
-//        itemNameTextView.setFocusable(false);
         itemNameTextView.setEnabled(false);
         itemNameTextView.setText(item.getName());
-//        Package pack = item.getPack();
-//        if(pack != null) {
-//            packageTextView.setText(pack.getType() + " " + pack.getAmount() + " " + pack.getUnit());
-//        }
         itemShortNameTextView.setEnabled(false);
         itemShortNameTextView.setText(item.getShortName());
         packageTextView.setEnabled(false);
@@ -269,7 +268,7 @@ public class ItemViewFragment extends Fragment implements Backable {
                             }
                         };
                         itemAreaTextView.setOnClickListener(actionShowItemOnClickListener);
-                        itemAreaImageView.setOnClickListener(actionShowItemOnClickListener);
+                        itemAreaTextViewIcon.setOnClickListener(actionShowItemOnClickListener);
                     }
                 }
             });

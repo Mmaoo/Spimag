@@ -26,6 +26,7 @@ public class RectAreaElement extends AreaElement implements Serializable {
     @Override
     public String toString() {
         return "RectAreaElement{" +
+                "areaId=" + areaId +
                 "x=" + x +
                 ", y=" + y +
                 ", width=" + width +
@@ -55,6 +56,19 @@ public class RectAreaElement extends AreaElement implements Serializable {
         }
 
         canvas.drawRect(x1, y1, x2, y2, paint);
+
+        if(settings != null && (settings instanceof Settings)){
+            Settings set = (Settings) settings;
+            if(set.isArea != null && set.isArea){
+                Paint borderPaint = new Paint();
+                borderPaint.setColor(Color.GREEN);
+                borderPaint.setStrokeWidth(5);
+                canvas.drawLine(x1,y1,x1,y2,borderPaint);
+                canvas.drawLine(x2,y1,x2,y2,borderPaint);
+                canvas.drawLine(x1,y1,x2,y1,borderPaint);
+                canvas.drawLine(x1,y2,x2,y2,borderPaint);
+            }
+        }
 
         Paint textPaint = new Paint();
         textPaint.setTextSize((float)width/5);

@@ -141,7 +141,6 @@ public class Area implements Serializable {
         return "Area{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", areas=" + areas +
                 ", items=" + items +
                 ", width=" + width +
                 ", height=" + height +

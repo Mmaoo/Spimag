@@ -73,7 +73,7 @@ public class FBAreaRecyclerViewAdapter extends RecyclerView.Adapter<AreaViewHold
     @NonNull
     @Override
     public AreaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recycler_element,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.area_recycler_element,parent,false);
         return new AreaViewHolder(view);
     }
 

@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.firebase.database.Exclude;
@@ -69,13 +70,11 @@ public class AreaElement implements AreaDrawable, Serializable {
 
     public static class Settings extends AreaDrawable.Settings {
         Integer color;
-
-        public Settings(int color) {
-            this.color = color;
-        }
+        Boolean isArea = false;
 
         public static class Builder {
             Integer color;
+            Boolean isArea = false;
 
             public Builder() {
             }
@@ -85,8 +84,16 @@ public class AreaElement implements AreaDrawable, Serializable {
                 return this;
             }
 
+            public Builder setArea(boolean isArea){
+                this.isArea = isArea;
+                return this;
+            }
+
             public Settings build(){
-                return new Settings(color);
+                Settings settings = new Settings();
+                settings.color = this.color;
+                settings.isArea = this.isArea;
+                return settings;
             }
         }
     }

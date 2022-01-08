@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
@@ -23,18 +22,17 @@ import androidx.annotation.NonNull;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.mmaoo.spimag.Backable;
 import com.mmaoo.spimag.Navigable;
 import com.mmaoo.spimag.R;
 import com.mmaoo.spimag.model.AppDatabase;
+import com.mmaoo.spimag.model.AppStorage;
 import com.mmaoo.spimag.model.Area;
-import com.mmaoo.spimag.model.AreaDrawable;
 import com.mmaoo.spimag.model.AreaElement;
 import com.mmaoo.spimag.model.Item;
-import com.mmaoo.spimag.model.RectAreaElement;
-import com.mmaoo.spimag.ui.areaList.AreaListFragment;
-
-import java.util.ArrayList;
 
 public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callback, Runnable, Backable {
 
@@ -64,6 +62,7 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     AreaElement editedAreaElement = null;
     AreaElement viewedElement = null;
     MutableLiveData<Boolean> edited = new MutableLiveData<Boolean>();
+    MutableLiveData<Object> clickedObject = new MutableLiveData<>();
 
     public ActionMode actionMode = null;
 
@@ -96,7 +95,26 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 case R.id.save:
                     o = getObjectByAreaElement(editedAreaElement);
                     if(o instanceof Item){
-                        AppDatabase.getInstance().update((Item) o);
+                        Item it = (Item) o;
+                        Log.d(this.getClass().toString(),"save: item="+it.toString()+", editedAreaElement="+editedAreaElement.toString());
+                        if(it.getAreaElement() != null && !it.getAreaElement().areaId.equals(editedAreaElement.areaId)){
+                            Log.d(this.getClass().toString(),"remove item from old area "+it.getAreaElement().areaId);
+
+                            AppDatabase.getInstance().getArea(it.getAreaElement().areaId).addOnSuccessListener(new OnSuccessListener<Area>() {
+                                @Override
+                                public void onSuccess(Area oldArea) {
+                                    for(Pair<Item,AreaElement> pair : oldArea.getItems()){
+                                        if(pair.first.getId().equals(it.getId())){
+                                            Log.d(this.getClass().toString(),"item found in old area: "+it.toString()+", "+oldArea.toString());
+                                            oldArea.getItems().remove(pair);
+                                            AppDatabase.getInstance().update(oldArea);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        it.setAreaElement(editedAreaElement);
+                        AppDatabase.getInstance().update(it);
                     }
                     AppDatabase.getInstance().update(area);
                     actionModeAction = ACTION_SAVED;
@@ -105,9 +123,17 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 case R.id.deleteElement:
                     o = getObjectByAreaElement(editedAreaElement);
                     if(o instanceof Item){
-                        area.getItems().remove(o);
+                        for(Pair<Item,AreaElement> pair : area.getItems()){
+                            if(pair.first.equals(o)){
+                                pair.first.setAreaElement(null);
+                                AppDatabase.getInstance().update(pair.first);
+                                area.getItems().remove(pair);break;
+                            }
+                        }
                     }else if(o instanceof Area){
-                        area.getAreas().remove(o);
+                        for(Pair<Area,AreaElement> pair : area.getAreas()){
+                            if(pair.first.equals(o)){ area.getAreas().remove(pair);break; }
+                        }
                     }
                     AppDatabase.getInstance().update(area);
                     actionModeAction = ACTION_DELETED;
@@ -148,11 +174,26 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                return false;
+                Log.d("GestureDetector","onSingleTapUp");
+                if (actionMode == null) {
+                    Pair<Item,AreaElement> itemPair = checkItemClick(new PointF(e.getX(),e.getY()));
+                    if(itemPair != null){
+                        clickedObject.setValue(itemPair.first);
+                    }else {
+                        Pair<Area, AreaElement> areaPair = checkAreaClick(new PointF(e.getX(), e.getY()));
+                        if (areaPair != null) {
+                            clickedObject.setValue(areaPair.first);
+                        }
+                    }
+                }
+                return true;
             }
 
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+//                double d = Math.sqrt((distanceX*distanceX)+(distanceY*distanceY));
+//                scale *= d;
+//                return true;
                 return false;
             }
 
@@ -162,12 +203,11 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 if (actionMode == null) {
                     Pair<Item,AreaElement> itemPair = checkItemClick(new PointF(e.getX(),e.getY()));
                     if(itemPair != null){
-                        setEditedAreaElement(itemPair);
+                        setEditedAreaElementOfItem(itemPair);
                     }else {
                         Pair<Area, AreaElement> areaPair = checkAreaClick(new PointF(e.getX(), e.getY()));
                         if (areaPair != null) {
-                            editedAreaElement = areaPair.second;
-                            actionMode = startActionMode(actionModeCallback);
+                            setEditedAreaElementOfArea(areaPair);
                         }
                     }
                 }
@@ -180,11 +220,32 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         });
     }
 
-    public void setEditedAreaElement(Pair<Item,AreaElement> itemPair){
+    public void setEditedAreaElementOfItem(Pair<Item,AreaElement> itemPair){
         Log.d(this.getClass().toString(),"setEditedAreaElement: "+itemPair.toString());
-        if(!area.getItems().contains(itemPair)) area.getItems().add(itemPair);
+        //if(!area.getItems().contains(itemPair)) area.getItems().add(itemPair);
+        Pair<Item,AreaElement> newPair = null;
+        for(Pair<Item, AreaElement> ip : area.getItems()){
+            if(ip.first.getId().equals(itemPair.first.getId())){
+                Log.d(this.getClass().toString(),"setEditedAreaElementOfItem oldPair: "+ip.toString());
+                newPair = ip;
+                break;
+            }
+        }
+        if(newPair == null){
+            Log.d(this.getClass().toString(),"setEditedAreaElementOfItem newPair: "+itemPair.toString());
+            area.getItems().add(itemPair);
+            newPair = itemPair;
+        }
         Log.d(this.getClass().toString(),"setEditedAreaElement: "+area.toString());
-        editedAreaElement = itemPair.second;
+        editedAreaElement = newPair.second;
+        actionMode = startActionMode(actionModeCallback);
+    }
+
+    public void setEditedAreaElementOfArea(Pair<Area,AreaElement> areaPair){
+        Log.d(this.getClass().toString(),"setEditedAreaElement: "+areaPair.toString());
+        if(!area.getAreas().contains(areaPair)) area.getAreas().add(areaPair);
+        Log.d(this.getClass().toString(),"setEditedAreaElement: "+area.toString());
+        editedAreaElement = areaPair.second;
         actionMode = startActionMode(actionModeCallback);
     }
 
@@ -202,7 +263,8 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             areaBitmap = Bitmap.createBitmap(getAreaWidth(),getAreaHeight(),Bitmap.Config.ARGB_8888);
 
             Canvas canvas = new Canvas(areaBitmap);
-            canvas.drawARGB(255,255,255,255);
+            //canvas.drawARGB(255,255,255,255);
+            canvas.drawColor(getResources().getColor(R.color.color_palete_3));
             drawTestCanvas(canvas);
             backgroundBitmap = Bitmap.createBitmap(areaBitmap);
         }
@@ -238,7 +300,8 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     canvas = holder.lockCanvas(null);
                     synchronized (barrier){
                         if(threadRunning){
-                            canvas.drawARGB(255,255,0,255);
+                            //canvas.drawARGB(255,255,255,255);
+                            canvas.drawColor(getResources().getColor(R.color.color_palete_3));
                             canvas.drawBitmap(backgroundBitmap,areaBitmapPos.x,areaBitmapPos.y,null);
                             
                             //canvas.drawBitmap(areaBitmap,areaBitmapPos.x,areaBitmapPos.y,null);
@@ -248,7 +311,7 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                                 for (Pair<Area, AreaElement> areaPair : area.getAreas()) {
                                     Area area = areaPair.first;
                                     AreaElement areaElement = areaPair.second;
-                                    areaElement.draw(canvas, areaBitmapPos, scale, area.getName(), null);
+                                    areaElement.draw(canvas, areaBitmapPos, scale, area.getName(), new AreaElement.Settings.Builder().setArea(true).build());
                                 }
 
                                 for (Pair<Item, AreaElement> itemPair : area.getItems()) {
@@ -259,13 +322,13 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                                     areaElement.draw(canvas, areaBitmapPos, scale, name, null);
                                 }
                             }else{
-                                AreaElement.Settings selectedSet = (new AreaElement.Settings.Builder()).setColor(Color.RED).build();
-                                AreaElement.Settings unselectedSet = (new AreaElement.Settings.Builder()).setColor(Color.GRAY).build();
+                                AreaElement.Settings.Builder selectedSet = (new AreaElement.Settings.Builder()).setColor(Color.RED);
+                                AreaElement.Settings.Builder unselectedSet = (new AreaElement.Settings.Builder()).setColor(Color.GRAY);
                                 for (Pair<Area, AreaElement> areaPair : area.getAreas()) {
                                     Area area = areaPair.first;
                                     AreaElement areaElement = areaPair.second;
-                                    if(areaElement == editedAreaElement) areaElement.draw(canvas, areaBitmapPos, scale, area.getName(), selectedSet);
-                                    else areaElement.draw(canvas, areaBitmapPos, scale, area.getName(), unselectedSet);
+                                    if(areaElement == editedAreaElement) areaElement.draw(canvas, areaBitmapPos, scale, area.getName(), selectedSet.setArea(true).build());
+                                    else areaElement.draw(canvas, areaBitmapPos, scale, area.getName(), unselectedSet.setArea(true).build());
                                 }
 
                                 for (Pair<Item, AreaElement> itemPair : area.getItems()) {
@@ -273,8 +336,8 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                                     AreaElement areaElement = itemPair.second;
                                     String name = item.getShortName();
                                     if (name == null) name = item.getName();
-                                    if(areaElement == editedAreaElement) areaElement.draw(canvas, areaBitmapPos, scale, name, selectedSet);
-                                    else areaElement.draw(canvas, areaBitmapPos, scale, name, unselectedSet);
+                                    if(areaElement == editedAreaElement) areaElement.draw(canvas, areaBitmapPos, scale, name, selectedSet.build());
+                                    else areaElement.draw(canvas, areaBitmapPos, scale, name, unselectedSet.build());
                                 }
                             }
                         }
@@ -389,7 +452,7 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private Pair<Area,AreaElement> checkAreaClick(PointF e){
         for (int i = area.getAreas().size() - 1; i >= 0; i--) {
-            AreaElement areaElement = area.getItems().get(i).second;
+            AreaElement areaElement = area.getAreas().get(i).second;
             if (areaElement.insideArea(e.x - areaBitmapPos.x, e.y - areaBitmapPos.y)) return area.getAreas().get(i);
         }
         return null;
@@ -475,8 +538,19 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         areaBitmap = Bitmap.createBitmap(area.getWidth(),area.getHeight(),Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(areaBitmap);
         canvas.drawARGB(255,255,255,255);
-        drawTestCanvas(canvas);
+//        drawTestCanvas(canvas);
         backgroundBitmap = Bitmap.createBitmap(areaBitmap);
+        AppStorage.getInstance().getAreaBackground(area.getId()).addOnCompleteListener(new OnCompleteListener<Bitmap>() {
+            @Override
+            public void onComplete(@NonNull Task<Bitmap> task) {
+                if(task.isSuccessful()){
+                    backgroundBitmap = task.getResult();
+                }else{
+                    drawTestCanvas(canvas);
+                    backgroundBitmap = backgroundBitmap = Bitmap.createBitmap(areaBitmap);
+                }
+            }
+        });
     }
 
     public void setAction(int action) {
@@ -487,6 +561,8 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         this.navigable = navigable;
     }
 
+    public void setAreaBackgroundBitmap(Bitmap bitmap){ this.backgroundBitmap = bitmap;}
+
     private Object getObjectByAreaElement(AreaElement areaElement){
         for(Pair<Item,AreaElement> pair : area.getItems()){
             if(areaElement == pair.second) return pair.first;
@@ -496,4 +572,5 @@ public class AreaSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
         return null;
     }
+
 }

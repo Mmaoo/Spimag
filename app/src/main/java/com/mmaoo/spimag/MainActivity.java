@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.firebase.ui.auth.AuthUI;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.mmaoo.spimag.ui.ItemView.ItemViewFragment;
 import com.mmaoo.spimag.ui.areaAdd.AreaAddFragment;
+import com.mmaoo.spimag.ui.areaBackgroundEdit.AreaBackgroundEditFragment;
 import com.mmaoo.spimag.ui.areaList.AreaListFragment;
 import com.mmaoo.spimag.ui.areaShow.AreaShowFragment;
 
@@ -155,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements Navigable {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.change_password: break;
+//            case R.id.change_password: break;
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
                 Intent restartActivity = new Intent(this,MainActivity.class);
@@ -207,6 +209,9 @@ public class MainActivity extends AppCompatActivity implements Navigable {
             case R.id.action_navigate_to_area_list:
                 mainFragmentStateAdapter.updateFragment(new AreaListFragment(),currentTabPosition);
                 break;
+            case R.id.action_navigate_to_area_background_edit:
+                mainFragmentStateAdapter.updateFragment(new AreaBackgroundEditFragment(),currentTabPosition);
+                break;
         }
     }
 
@@ -237,6 +242,11 @@ public class MainActivity extends AppCompatActivity implements Navigable {
                 fragment.setArguments(bundle);
                 mainFragmentStateAdapter.updateFragment(fragment,currentTabPosition);
                 break;
+            case R.id.action_navigate_to_area_background_edit:
+                fragment = new AreaBackgroundEditFragment();
+                fragment.setArguments(bundle);
+                mainFragmentStateAdapter.updateFragment(fragment,currentTabPosition);
+                break;
         }
 //        setProperBottomNavigationItem(action);
 //        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action,bundle);
@@ -248,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements Navigable {
         if(!mainFragmentStateAdapter.removeFragment(mainFragmentStateAdapter.createFragment(currentTabPosition),currentTabPosition)){
             super.onBackPressed();
         }
+        if(mainFragmentStateAdapter.createFragment(currentTabPosition) instanceof AreaShowFragment) viewPager.setUserInputEnabled(false);
     }
 
     @Override
@@ -256,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements Navigable {
         if(!mainFragmentStateAdapter.removeFragment(mainFragmentStateAdapter.createFragment(currentTabPosition),currentTabPosition,bundle)){
             super.onBackPressed();
         }
+        if(mainFragmentStateAdapter.createFragment(currentTabPosition) instanceof AreaShowFragment) viewPager.setUserInputEnabled(false);
     }
 
     private void setProperBottomNavigationItem(int action){
@@ -267,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements Navigable {
             case R.id.action_navigate_to_area_add:
             case R.id.action_navigate_to_area_show:
             case R.id.action_navigate_to_area_list:
+            case R.id.action_navigate_to_area_background_edit:
                 currentTabPosition = MainFragmentStateAdapter.AREAS_POSITION;
                 viewPager.setCurrentItem(currentTabPosition);
                 break;
