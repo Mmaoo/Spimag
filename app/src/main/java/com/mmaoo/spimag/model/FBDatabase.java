@@ -183,13 +183,44 @@ public class FBDatabase implements Database {
     @Override
     public Task<Area> remove(Area area) {
         if (area != null){
-            Log.d(this.getClass().toString(),"removeItem "+ area.toString());
+            Log.d(this.getClass().toString(),"removeArea "+ area.toString());
 
             String uid = AppUser.getInstance().getUid();
             DatabaseReference reference = firebaseDatabase.getReference().child(PATH_USER).child(uid).child(PATH_AREA);
-            reference.child(area.getId()).removeValue();
-            // get items of this area
-            // set area of items to null
+
+            for(Pair<Item,AreaElement> pair : area.getItems()){
+                pair.first.setAreaElement(null);
+                AppDatabase.getInstance().update(pair.first);
+            }
+
+            // remove references to removed area
+            getAllAreas().addOnSuccessListener(new OnSuccessListener<ArrayList<Area>>() {
+                @Override
+                public void onSuccess(ArrayList<Area> areas) {
+                    Log.d(this.getClass().toString(),"removeArea-allAreas: "+areas.toString());
+                    // check all user's areas if have reference to removed area
+                    for(Area area1 : areas){
+                        Log.d(this.getClass().toString(),"removeArea-oneOfAllAreas: "+area1.toString());
+                        if(area1.getId().contentEquals(area.getId())) continue;
+                        // check for equals subareas
+                        boolean modified = false;
+                        for(Pair<Area,AreaElement> subAreaPair1 : area1.getAreas()){
+                            Log.d(this.getClass().toString(),"removeArea-oneOfSubArea: "+subAreaPair1.toString());
+                            // remove reference to area
+                            if(subAreaPair1.first.getId().contentEquals(area.getId())){
+                                Log.d(this.getClass().toString(),"removeArea-oneOfAllAreas-toRemove: "+subAreaPair1.first);
+                                area1.getAreas().remove(subAreaPair1);
+                                modified = true;
+                            }
+                        }
+                        if(modified) {
+                            Log.d(this.getClass().toString(),"removeArea-oneOfAllAreas-modified: "+area1.toString());
+                            AppDatabase.getInstance().update(area1); // update area if modified
+                        }
+                    }
+                    reference.child(area.getId()).removeValue();
+                }
+            });
         }
         return null;
     }

@@ -28,6 +28,8 @@ import com.mmaoo.spimag.model.AppDatabase;
 import com.mmaoo.spimag.model.Area;
 import com.mmaoo.spimag.model.FBDatabase;
 import com.mmaoo.spimag.model.Item;
+import com.mmaoo.spimag.ui.areaAdd.AreaAddFragment;
+import com.mmaoo.spimag.ui.areaList.AreaListFragment;
 import com.mmaoo.spimag.ui.areaShow.AreaShowFragment;
 
 import java.util.Arrays;
@@ -130,6 +132,7 @@ public class ItemViewFragment extends Fragment implements Backable {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_item_view, container, false);
+        setHasOptionsMenu(true);
         return root;
     }
 
@@ -326,5 +329,25 @@ public class ItemViewFragment extends Fragment implements Backable {
     public void onPause() {
 //        AppDatabase.getInstance().update(item);
         super.onPause();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.item_fragment_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()){
+            case R.id.removeItem:
+                AppDatabase.getInstance().remove(this.item);
+                navigable.navigateUp();
+                break;
+        }
+
+        return true;
     }
 }

@@ -140,7 +140,8 @@
                     android:paddingHorizontal="10dp"
                     app:icon="@drawable/ic_baseline_remove_black_24"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/incPackButton" />
+                    app:layout_constraintEnd_toStartOf="@id/incPackButton"
+                    android:layout_marginRight="10dp"/>
 
                 <Button
                     android:id="@+id/incPackButton"

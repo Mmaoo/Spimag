@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.mmaoo.spimag.Backable;
 import com.mmaoo.spimag.Navigable;
 import com.mmaoo.spimag.R;
+import com.mmaoo.spimag.model.AppDatabase;
 import com.mmaoo.spimag.model.Area;
 import com.mmaoo.spimag.model.AreaElement;
 import com.mmaoo.spimag.model.Item;
@@ -191,15 +192,6 @@ public class AreaShowFragment extends Fragment implements Backable {
         super.onOptionsItemSelected(item);
 
         switch (item.getItemId()){
-//            case R.id.addElement:
-//                RectAreaElement rectAreaElement = new RectAreaElement();
-//                int size = areaSurfaceView.getWidth() < areaSurfaceView.getHeight() ? areaSurfaceView.getWidth()/8 : areaSurfaceView.getHeight()/8;
-//                rectAreaElement.width = size;
-//                rectAreaElement.height = size;
-//                Random rnd = new Random();
-//                rectAreaElement.color = Color.argb(255,rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256));
-//                areaSurfaceView.areaElements.add(rectAreaElement);
-//                break;
             case R.id.changeName:
                 Bundle cNBundle = new Bundle();
                 cNBundle.putSerializable("area",area);
@@ -217,6 +209,10 @@ public class AreaShowFragment extends Fragment implements Backable {
                 aABundle.putInt("action", AreaListFragment.ACTION_ADD_AREA);
                 aABundle.putSerializable("area",area);
                 navigable.navigate(R.id.action_navigate_to_area_list,aABundle);
+                break;
+            case R.id.removeArea:
+                AppDatabase.getInstance().remove(area);
+                navigable.navigate(R.id.action_navigate_to_area_list);
                 break;
         }
 
