@@ -235,4 +235,16 @@ public class AreaShowFragment extends Fragment implements Backable {
         if(areaSurfaceView instanceof Backable) return  ((Backable) areaSurfaceView).onBackPressed();
         return false;
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(areaSurfaceView != null) areaSurfaceView.pausePaint();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (areaSurfaceView != null) areaSurfaceView.resumePaint();
+    }
 }

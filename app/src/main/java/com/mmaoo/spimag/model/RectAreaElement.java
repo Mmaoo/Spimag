@@ -62,7 +62,7 @@ public class RectAreaElement extends AreaElement implements Serializable {
             if(set.isArea != null && set.isArea){
                 Paint borderPaint = new Paint();
                 borderPaint.setColor(Color.GREEN);
-                borderPaint.setStrokeWidth(5);
+                borderPaint.setStrokeWidth(10);
                 canvas.drawLine(x1,y1,x1,y2,borderPaint);
                 canvas.drawLine(x2,y1,x2,y2,borderPaint);
                 canvas.drawLine(x1,y1,x2,y1,borderPaint);

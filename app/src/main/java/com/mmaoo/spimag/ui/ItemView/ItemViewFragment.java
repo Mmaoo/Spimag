@@ -270,8 +270,10 @@ public class ItemViewFragment extends Fragment implements Backable {
                                 navigable.navigate(R.id.action_navigate_to_area_show,args);
                             }
                         };
+
                         itemAreaTextView.setOnClickListener(actionShowItemOnClickListener);
                         itemAreaTextViewIcon.setOnClickListener(actionShowItemOnClickListener);
+                        itemAreaTextViewIcon.setVisibility(View.VISIBLE);
                     }
                 }
             });

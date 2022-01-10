@@ -178,7 +178,8 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@id/itemAreaTextView"
                     app:layout_constraintTop_toTopOf="@id/itemAreaTextView"
-                    app:layout_constraintBottom_toBottomOf="@id/itemAreaTextView"/>
+                    app:layout_constraintBottom_toBottomOf="@id/itemAreaTextView"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/itemAreaEditButton"
